@@ -1,0 +1,80 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>Login</title>
+    <meta name="description" content="The HTML5 Herald">
+    <meta name="author" content="SitePoint">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(function(){
+
+            $('.login-button').on('click', function(e) {
+                e.preventDefault();
+                const username = $('input[name=username]').val();
+                const password = $('input[name=password]').val();
+                const code = $('input[name=code]').val();
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'http://local.asia.tv5monde.com/oauth/token',
+                    data: {
+                        username: username,
+                        password: password,
+                        grant_type: 'password',
+                        client_id: 'dcc1af5c-918a-43e9-b4d6-6dfed2484b7d',
+                        scope: 'basic_account_user'
+                    },
+                    success: function(d) {
+
+                        // If this is successful, send a signal to the tv app
+                        console.log('success data', d);
+
+                        const resultData = {
+                            code: code,
+                            access_token: d.access_token
+                        };
+
+                        $.ajax({
+                            type: 'POST',
+                            url: '/success',
+                            data: JSON.stringify(resultData),
+                            contentType: "application/json",
+                            success: function(d) {
+
+                                // If this is successful, send a signal to the tv app
+                                console.log('success data', d);
+                                alert('You are now connected on your TV');
+
+                            },
+                            error: function(e) {
+                                alert('A weird error occured');
+                            }
+                        });
+
+
+                    },
+                    error: function(e) {
+                        alert('Invalid credentials');
+                    }
+                });
+            })
+
+        });
+
+    </script>
+
+</head>
+
+<body>
+<form>
+    <h1>Please login to continue</h1>
+    <input type="text" name="username" placeholder="Login">
+    <input type="password" name="password" placeholder="Password">
+    <input type="hidden" name="code" value="<%= code %>">
+    <button class="login-button">Login</button>
+</form>
+</body>
+</html>
